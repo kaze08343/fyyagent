@@ -7,7 +7,7 @@
       "name": "AliyunBailianMCP_WebSearch",
       "baseUrl": "https://dashscope.aliyuncs.com/api/v1/mcps/WebSearch/mcp",
       "headers": {
-        "Authorization": "Bearer sk-62b5d55f740244fa89bdbcf476cf9bfa"
+        "Authorization": 
       }
     }
   }
