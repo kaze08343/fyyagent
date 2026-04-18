@@ -7,7 +7,7 @@ spring:
       chat:
         model: qwen3:4b
     dashscope:
-      api-key: "sk-62b5d55f740244fa89bdbcf476cf9bfa"
+      api-key
       chat:
         options:
           model: qwen-plus
