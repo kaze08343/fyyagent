@@ -1,0 +1,32 @@
+
+
+spring:
+  application:
+    name: yu-ai-agent
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/chat_memory_db
+  profiles:
+    active: local
+server:
+  port: 8123
+  servlet:
+    context-path: /api
+
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: org.example.yuaiagent.controller
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn

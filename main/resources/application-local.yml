@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: yu-ai-agent
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: qwen3:4b
+    dashscope:
+      api-key: "sk-62b5d55f740244fa89bdbcf476cf9bfa"
+      chat:
+        options:
+          model: qwen-plus
+    mcp:
+      client:
+        enabled: false

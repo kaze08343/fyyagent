@@ -1,0 +1,173 @@
+//package org.example.yuaiagent.agent;
+//
+//import lombok.Data;
+//import lombok.extern.slf4j.Slf4j;
+//import org.example.yuaiagent.agent.model.AgentState;
+//import org.springframework.ai.chat.client.ChatClient;
+//import org.springframework.ai.chat.messages.Message;
+//import org.springframework.ai.chat.messages.UserMessage;
+//import cn.hutool.core.util.StrUtil;
+//import java.util.ArrayList;
+//import java.util.List;
+//@Slf4j
+//@Data
+//public abstract class BaseAgent {
+//
+//
+//    private String name;
+//
+//
+//    private String systemPrompt;
+//    private String nextStepPrompt;
+//
+//
+//    private AgentState state = AgentState.IDLE;
+//
+//
+//    private int maxSteps = 10;
+//    private int currentStep = 0;
+//
+//
+//    private ChatClient chatClient;
+//
+//
+//    private List<Message> messageList = new ArrayList<>();
+//
+//
+//    public String run(String userPrompt) {
+//        if (this.state != AgentState.IDLE) {
+//            throw new RuntimeException("Cannot run agent from state: " + this.state);
+//        }
+//        if (StrUtil.isBlank(userPrompt)) {
+//            throw new RuntimeException("Cannot run agent with empty user prompt");
+//        }
+//
+//        state = AgentState.RUNNING;
+//
+//        messageList.add(new UserMessage(userPrompt));
+//
+//        List<String> results = new ArrayList<>();
+//        try {
+//            for (int i = 0; i < maxSteps && state != AgentState.FINISHED; i++) {
+//                int stepNumber = i + 1;
+//                currentStep = stepNumber;
+//                log.info("Executing step " + stepNumber + "/" + maxSteps);
+//
+//                String stepResult = step();
+//                String result = "Step " + stepNumber + ": " + stepResult;
+//                results.add(result);
+//            }
+//
+//            if (currentStep >= maxSteps) {
+//                state = AgentState.FINISHED;
+//                results.add("Terminated: Reached max steps (" + maxSteps + ")");
+//            }
+//            return String.join("\n", results);
+//        } catch (Exception e) {
+//            state = AgentState.ERROR;
+//            log.error("Error executing agent", e);
+//            return "执行错误" + e.getMessage();
+//        } finally {
+//
+//            this.cleanup();
+//        }
+//    }
+//
+//
+//    public abstract String step();
+//
+//
+//    protected void cleanup() {
+//
+//    }
+//}
+package org.example.yuaiagent.agent;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.example.yuaiagent.agent.model.AgentState;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
+import cn.hutool.core.util.StrUtil;
+import java.util.ArrayList;
+import java.util.List;
+@Slf4j
+@Data
+public abstract class BaseAgent {
+
+
+    private String name;
+
+
+    private String systemPrompt;
+    private String nextStepPrompt;
+
+
+    private AgentState state = AgentState.IDLE;
+
+
+    private int maxSteps = 10;
+    private int currentStep = 0;
+
+
+    private ChatClient chatClient;
+
+
+    private List<Message> messageList = new ArrayList<>();
+
+    private String currentChatId;
+
+
+    public String run(String userPrompt) {
+        return run(userPrompt, null);
+    }
+
+    public String run(String userPrompt, String chatId) {
+        if (this.state != AgentState.IDLE) {
+            throw new RuntimeException("Cannot run agent from state: " + this.state);
+        }
+        if (StrUtil.isBlank(userPrompt)) {
+            throw new RuntimeException("Cannot run agent with empty user prompt");
+        }
+
+        this.currentChatId = chatId;
+        state = AgentState.RUNNING;
+
+        messageList.add(new UserMessage(userPrompt));
+
+        List<String> results = new ArrayList<>();
+        try {
+            for (int i = 0; i < maxSteps && state != AgentState.FINISHED; i++) {
+                int stepNumber = i + 1;
+                currentStep = stepNumber;
+                log.info("Executing step " + stepNumber + "/" + maxSteps);
+
+                String stepResult = step();
+                String result = "Step " + stepNumber + ": " + stepResult;
+                results.add(result);
+            }
+
+            if (currentStep >= maxSteps) {
+                state = AgentState.FINISHED;
+                results.add("Terminated: Reached max steps (" + maxSteps + ")");
+            }
+            return String.join("\n", results);
+        } catch (Exception e) {
+            state = AgentState.ERROR;
+            log.error("Error executing agent", e);
+            return "执行错误" + e.getMessage();
+        } finally {
+
+            this.cleanup();
+        }
+    }
+
+
+    public abstract String step();
+
+
+    protected void cleanup() {
+
+    }
+}
